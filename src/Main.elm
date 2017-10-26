@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Json.Encode as JE
 import Http
 import Json.Decode as Decode
+import String
 
 
 ---- MODEL ----
@@ -17,7 +18,9 @@ type alias Model =
 type alias MeetingRoom = 
     {
         roomName : String,
-        available : Bool
+        available : Bool,
+        nextAvailable: String,
+        nextMeeting: String
     }
 
 type RoomState = BookedAndOccupied | BookedAndVacant | NotBookedAndOccupied | NotBookedAndVacant
@@ -79,10 +82,19 @@ meetingRoomView room =
     div [class "col-sm-6"] [
         div [class (roomStatus room.available)] 
         [ div [class "card-body"] 
-            [ Html.h4 [class "card-title"] [text room.roomName]
+            [ Html.h4 [class "card-title"] [text room.roomName],
+              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room.available room.nextAvailable room.nextMeeting)]
             ]
         ]
     ]
+
+getNextAvailMeetingString : Bool -> String -> String -> String
+getNextAvailMeetingString available nextAvailable nextMeeting =
+    case available of
+        True ->
+            String.concat ["Booked: ", nextMeeting]
+        False ->
+            String.concat ["Open: ", nextAvailable]
 
 listMeetingRooms : List MeetingRoom -> Html Msg
 listMeetingRooms rooms =
@@ -141,7 +153,7 @@ getAvailability availability =
 
 ---- JSON ----
 availabilityDecoder : Decode.Decoder MeetingRoom
-availabilityDecoder = Decode.map2 MeetingRoom (Decode.field "roomName" Decode.string) (Decode.field "available" Decode.bool)
+availabilityDecoder = Decode.map4 MeetingRoom (Decode.field "roomName" Decode.string) (Decode.field "available" Decode.bool) (Decode.field "nextAvailable" Decode.string) (Decode.field "nextMeeting" Decode.string)
 
 availabilityListDecoder : Decode.Decoder (List MeetingRoom)
 availabilityListDecoder = Decode.list availabilityDecoder
