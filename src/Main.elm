@@ -58,7 +58,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ headerView
-        , timeSearchView
+        , keyView
         , listMeetingRooms model.meetingRooms
         , footerView
         ]
@@ -77,9 +77,45 @@ timeSearchView =
         ]
     ]
 
+keyView : Html Msg
+keyView =
+    div [class "row"] [
+        div [class "col-sm-3"] [
+            div [class "room-card room-state-not-booked"]
+            [ div [class "card-body"]
+                [ Html.h4 [class "card-title"] [text "Open and Empty"]
+                ]
+            ]
+        ],
+
+        div [class "col-sm-3"] [
+            div [class "room-card room-state-not-booked-occupied"]
+            [ div [class "card-body"]
+                [ Html.h4 [class "card-title"] [text "Open and Occupied"]
+                ]
+            ]
+        ],
+
+        div [class "col-sm-3"] [
+            div [class "room-card room-state-booked-not-occupied"]
+            [ div [class "card-body"]
+                [ Html.h4 [class "card-title"] [text "Booked and Empty"]
+                ]
+            ]
+        ],
+
+        div [class "col-sm-3"] [
+            div [class "room-card room-state-booked"]
+            [ div [class "card-body"]
+                [ Html.h4 [class "card-title"] [text "Booked, Occupied"]
+                ]
+            ]
+        ]
+    ]
+
 meetingRoomView : MeetingRoom -> Html Msg
 meetingRoomView room =
-    div [class "col-sm-6"] [
+    div [class "col-sm-3"] [
         div [class (roomStatus room.available)] 
         [ div [class "card-body"] 
             [ Html.h4 [class "card-title"] [text room.roomName],
@@ -92,9 +128,9 @@ getNextAvailMeetingString : Bool -> String -> String -> String
 getNextAvailMeetingString available nextAvailable nextMeeting =
     case available of
         True ->
-            String.concat ["Booked: ", nextMeeting]
+            String.concat ["Booked at ", nextMeeting]
         False ->
-            String.concat ["Open: ", nextAvailable]
+            String.concat ["Open at ", nextAvailable]
 
 listMeetingRooms : List MeetingRoom -> Html Msg
 listMeetingRooms rooms =
