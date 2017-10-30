@@ -20,7 +20,8 @@ type alias MeetingRoom =
         roomName : String,
         available : Bool,
         nextAvailable: String,
-        nextMeeting: String
+        nextMeeting: String,
+        occupied: Bool
     }
 
 type RoomState = BookedAndOccupied | BookedAndVacant | NotBookedAndOccupied | NotBookedAndVacant
@@ -58,6 +59,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ headerView
+        , legendView
         , keyView
         , listMeetingRooms model.meetingRooms
         , footerView
@@ -79,35 +81,35 @@ timeSearchView =
 
 keyView : Html Msg
 keyView =
-    div [class "row"] [
+    div [class "row bottom"] [
         div [class "col-sm-3"] [
-            div [class "room-card room-state-not-booked"]
+            div [class "key-card room-state-not-booked"]
             [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Open and Empty"]
+                [ Html.h5 [class "card-title"] [text "Open and Empty"]
                 ]
             ]
         ],
 
         div [class "col-sm-3"] [
-            div [class "room-card room-state-not-booked-occupied"]
+            div [class "key-card room-state-not-booked-occupied"]
             [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Open and Occupied"]
+                [ Html.h5 [class "card-title"] [text "Open and Occupied"]
                 ]
             ]
         ],
 
         div [class "col-sm-3"] [
-            div [class "room-card room-state-booked-not-occupied"]
+            div [class "key-card room-state-booked-not-occupied"]
             [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Booked and Empty"]
+                [ Html.h5 [class "card-title"] [text "Booked and Empty"]
                 ]
             ]
         ],
 
         div [class "col-sm-3"] [
-            div [class "room-card room-state-booked"]
+            div [class "key-card room-state-booked"]
             [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Booked, Occupied"]
+                [ Html.h5 [class "card-title"] [text "Booked, Occupied"]
                 ]
             ]
         ]
@@ -142,15 +144,24 @@ listMeetingRooms rooms =
 
 headerView : Html Msg
 headerView = 
-    div [class "navbar navbar-expand-lg navbar-dark bg-dark fixed-top"] [
+    div [class "navbar navbar-expand-lg navbar-light nav-bar fixed-top"] [
         div [class "container"] [
-            Html.a [class "navbar-brand", href "#"] [text "Hodor"]
+            Html.a [class "navbar-brand text-white", href "#"] [text "Hodor"]
         ]
     ]
 
+legendView : Html Msg
+legendView =
+    div [class "row"] [
+        div [class "key-legend"] [
+            Html.p [] [text "open and empty"],
+            Html.p [] [text "open and occupied"]
+        ]
+    ] 
+
 footerView : Html Msg
 footerView =
-    div [class "py-5 bg-dark"]
+    div [class "py-5 nav-bar"]
         [ div [class "container"] [
             Html.p [class "m-0 text-center text-white"] [text "Hodor 2017"]
         ]
@@ -183,16 +194,32 @@ getAvailability : (List MeetingRoom) -> Cmd Msg
 getAvailability availability =
   let
     url =
-      "http://localhost:8080/meetingRoom/lookup/all/availability"
+      --"http://localhost:8080/meetingRoom/lookup/all/availability"
+      "http://hodorserver-env.us-east-1.elasticbeanstalk.com/meetingRoom/lookup/all/availability"
   in
     Http.send LoadedAvailability (Http.get url availabilityListDecoder)
 
 ---- JSON ----
 availabilityDecoder : Decode.Decoder MeetingRoom
-availabilityDecoder = Decode.map4 MeetingRoom (Decode.field "roomName" Decode.string) (Decode.field "available" Decode.bool) (Decode.field "nextAvailable" Decode.string) (Decode.field "nextMeeting" Decode.string)
+availabilityDecoder = Decode.map5 MeetingRoom (Decode.field "roomName" Decode.string) (Decode.field "available" Decode.bool) (Decode.field "nextAvailable" Decode.string) (Decode.field "nextMeeting" Decode.string) (Decode.field "occupied" Decode.bool)
 
 availabilityListDecoder : Decode.Decoder (List MeetingRoom)
 availabilityListDecoder = Decode.list availabilityDecoder
+
+---- Filters ----
+openAndVacant : MeetingRoom -> Maybe MeetingRoom
+openAndVacant meetingRoom =
+    if meetingRoom.available && not meetingRoom.occupied then
+        Just meetingRoom
+    else
+        Nothing
+
+bookedAndVacant : MeetingRoom -> Maybe MeetingRoom
+bookedAndVacant meetingRoom =
+    if not meetingRoom.available && not meetingRoom.occupied then
+        Just meetingRoom
+    else
+        Nothing
 
 ---- Attributes ----
 boolAttribute : String -> Bool -> Attribute msg

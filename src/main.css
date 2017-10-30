@@ -14,11 +14,23 @@ body {
   margin-right: 20px;
   min-height: 104px;
 }
-
+.key-card {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 40px;
+  margin-right: 20px;
+  min-height: 68px;
+  border-color: #241C1C;
+  text-align: center;
+}
 .time-dropdown {
   margin: auto;
   width: 50%;
   padding: 10px;
+}
+
+.nav-bar {
+  background-color: #8CB8D7;
 }
 
 @media (min-width: 992px) {
@@ -62,3 +74,11 @@ body {
   border-radius: 5px;
   background-color: #f9b31d;
 }
+
+.key-legend {
+  background-color: rgb(250, 249, 242);
+  border-radius: 5px;
+}
+.bottom {
+  border-bottom: 0.5px solid #DBD6D6;
+} 
