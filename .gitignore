@@ -10,5 +10,11 @@ repl-temp-*
 # Dependency directories
 node_modules
 
+# package-lock
+package-lock.json
+
+# IntelliJ
+.idea/
+
 # Desktop Services Store on macOS
 .DS_Store

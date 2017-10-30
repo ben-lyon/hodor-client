@@ -1,12 +1,9 @@
 module Update exposing (..)
 
--- Tmp
-import Debug exposing (log)
-
 import Msgs exposing (..)
 import Models exposing (..)
 import Routing exposing (parseLocation)
-import Commands exposing (getAvailability)
+import Commands exposing (getAvailability, getRoomInfo)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -14,7 +11,7 @@ update msg model =
         LoadAvailability ->
             (model, getAvailability model.meetingRooms)
         LoadedAvailability (Ok meetingRooms) ->
-            ( Model meetingRooms HomeRoute, Cmd.none )
+            ( Model meetingRooms [] HomeRoute, Cmd.none )
         LoadedAvailability (Err _) ->
             ( model, Cmd.none )
         OnLocationChange location ->
@@ -23,8 +20,9 @@ update msg model =
                     parseLocation location
             in
                 ( { model | route = newRoute }, Cmd.none )
-        ShowRoomInfo roomName ->
-            ( { model | route = RoomRoute roomName }, Cmd.none )
-        Test ->
-            log "test"
+        LoadRoomSchedule roomName ->
+            ( { model | route = RoomRoute roomName }, getRoomInfo roomName )
+        LoadedRoomSchedule (Ok roomSchedule) ->
+            ( { model | roomSchedule = roomSchedule }, Cmd.none )
+        LoadedRoomSchedule (Err _) ->
             ( model, Cmd.none )

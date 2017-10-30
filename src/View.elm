@@ -28,7 +28,7 @@ page model =
 homePage : Model -> Html Msg
 homePage model =
     div []
-        [ headerView
+        [ headerView "Hodor"
         , keyView
         , listMeetingRooms model.meetingRooms
         , footerView
@@ -37,7 +37,27 @@ homePage model =
 roomPage : Model -> String -> Html Msg
 roomPage model roomName =
     div []
-        [text ( append "This is the info page for " roomName ) ]
+        [ headerView roomName
+        , listScheduledMeetings model.roomSchedule
+        ]
+
+listScheduledMeetings : List ScheduledMeeting -> Html Msg
+listScheduledMeetings meetingData =
+    let
+        meetingsView = List.map scheduledMeetingView meetingData
+    in
+        div [class "row"]
+            meetingsView
+
+scheduledMeetingView : ScheduledMeeting -> Html Msg
+scheduledMeetingView meeting =
+    div [class "col-sm-3"]
+        [ div [class "card-body"]
+            [ Html.h5 [] [text meeting.email]
+            , Html.h5 [] [text meeting.startDate]
+            , Html.h5 [] [text meeting.endDate]
+            ]
+        ]
 
 notFoundPage : Html Msg
 notFoundPage =
@@ -98,7 +118,7 @@ meetingRoomView : MeetingRoom -> Html Msg
 meetingRoomView room =
     div [class "col-sm-3"] [
         div [class (roomStatus room.available)]
-        [ div [class "card-body", onClick ( ShowRoomInfo room.roomName )]
+        [ div [class "card-body", onClick ( LoadRoomSchedule room.roomName )]
             [ Html.h4 [class "card-title"] [text room.roomName],
               Html.h5 [class "card-title"] [text (getNextAvailMeetingString room.available room.nextAvailable room.nextMeeting)]
             ]
@@ -121,11 +141,11 @@ listMeetingRooms rooms =
         div [class "row"]
             roomsView
 
-headerView : Html Msg
-headerView =
+headerView : String -> Html Msg
+headerView pageName =
     div [class "navbar navbar-expand-lg navbar-dark bg-dark fixed-top"] [
         div [class "container"] [
-            Html.a [class "navbar-brand", href "#"] [text "Hodor"]
+            Html.a [class "navbar-brand", href "#"] [text pageName]
         ]
     ]
 

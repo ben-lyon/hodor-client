@@ -12,16 +12,16 @@ import View exposing (view)
 
 
 
-init : (List MeetingRoom) -> Route -> ( Model, Cmd Msg )
-init meetingRooms route =
-    ( Model meetingRooms route, getAvailability meetingRooms )
+init : (List MeetingRoom) -> (List ScheduledMeeting) -> Route -> ( Model, Cmd Msg )
+init meetingRooms roomSchedule route =
+    ( Model meetingRooms roomSchedule route, getAvailability meetingRooms )
 
 
 main : Program Never Model Msg
 main =
     Html.program
         { view = view
-        , init = init [] HomeRoute
+        , init = init [] [] HomeRoute
         , update = update
         , subscriptions = always Sub.none
         }
