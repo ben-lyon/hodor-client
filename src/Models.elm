@@ -3,8 +3,11 @@ module Models exposing (..)
 type alias Model =
     {
         meetingRooms : List MeetingRoom,
+        roomName : String,
         roomSchedule : List ScheduledMeeting,
-        route: Route
+        route: Route,
+        autoUpdate: Bool,
+        time: Float
     }
 type alias MeetingRoom =
     {
@@ -15,9 +18,9 @@ type alias MeetingRoom =
     }
 type alias ScheduledMeeting =
     {
-        email: String,
-        startDate: String,
-        endDate: String
+        organizerName: String,
+        timeBlocks: Int,
+        timeRange: String
     }
 
 type RoomState = BookedAndOccupied | BookedAndVacant | NotBookedAndOccupied | NotBookedAndVacant

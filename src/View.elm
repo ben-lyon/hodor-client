@@ -1,13 +1,19 @@
 module View exposing (..)
 
+import Css exposing (asPairs, margin, pct, border3, rgb, px, solid, padding)
+import Date exposing (..)
 import Html exposing (Html, Attribute, text, div, img, a, button)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import String exposing (append)
+import String exposing (append, slice)
 
 import Models exposing (..)
 import Msgs exposing (..)
 import Json.Encode as JE
+
+styles : List Css.Style  -> Attribute msg
+styles =
+    Css.asPairs >> Html.Attributes.style
 
 
 view : Model -> Html Msg
@@ -38,6 +44,7 @@ roomPage : Model -> String -> Html Msg
 roomPage model roomName =
     div []
         [ headerView roomName
+        , currentTimeView model.time
         , listScheduledMeetings model.roomSchedule
         ]
 
@@ -46,18 +53,20 @@ listScheduledMeetings meetingData =
     let
         meetingsView = List.map scheduledMeetingView meetingData
     in
-        div [class "row"]
+        div [class "room-timeline"]
             meetingsView
 
 scheduledMeetingView : ScheduledMeeting -> Html Msg
 scheduledMeetingView meeting =
-    div [class "col-sm-3"]
-        [ div [class "card-body"]
-            [ Html.h5 [] [text meeting.email]
-            , Html.h5 [] [text meeting.startDate]
-            , Html.h5 [] [text meeting.endDate]
-            ]
+    div [class "meeting-block", style [("width", calculateMeetingLength meeting.timeBlocks), ("background-color", calculateMeetingBlockColor meeting.organizerName)] ]
+        [ Html.h6 [] [text meeting.organizerName]
+        , Html.h6 [] [text meeting.timeRange]
         ]
+
+currentTimeView : Float -> Html Msg
+currentTimeView time =
+    div [class "clock"]
+        [ time |> Date.fromTime |> toString |> (slice 17 22) |> text ]
 
 notFoundPage : Html Msg
 notFoundPage =
@@ -152,9 +161,10 @@ headerView pageName =
 footerView : Html Msg
 footerView =
     div [class "py-5 bg-dark"]
-        [ div [class "container"] [
-            Html.p [class "m-0 text-center text-white"] [text "Hodor 2017"]
-        ]
+        [ div [class "container"]
+            [
+                Html.p [class "m-0 text-center text-white"] [text "Hodor 2017"]
+            ]
         ]
 
 roomStatus : Bool -> String
@@ -177,6 +187,16 @@ roomStatusDescription status =
         NotBookedAndOccupied ->
             "Available but occupied"
 
+calculateMeetingLength : Int -> String
+calculateMeetingLength timeBlocks =
+    append (toString (timeBlocks * 175)) "px"
+
+calculateMeetingBlockColor : String -> String
+calculateMeetingBlockColor meetingName =
+    if meetingName == "Open" then
+        "#86E965"
+    else
+        "#ef7777"
 
 
 ---- Attributes ----

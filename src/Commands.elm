@@ -2,7 +2,9 @@ module Commands exposing (..)
 
 import Http
 import Json.Decode as Decode
-import String exposing (append, split, join)
+import String exposing (concat, split, join)
+import Task exposing (perform)
+import Time exposing (now)
 
 import Msgs exposing (..)
 import Models exposing (MeetingRoom, ScheduledMeeting)
@@ -22,7 +24,7 @@ getRoomInfo roomName =
     -- Encode the room name in url format. There's probably a better way to do this, but this was the most straightforward
     let
         url =
-            append "http://localhost:8080/meetingRoom/lookup/" (split " " roomName |> join "%20")
+            concat ["http://localhost:8080/meetingRoom/lookup/", (split " " roomName |> join "%20"), "/schedule"]
     in
         Http.send LoadedRoomSchedule (Http.get url roomScheduleListDecoder)
 
@@ -34,7 +36,12 @@ availabilityListDecoder : Decode.Decoder (List MeetingRoom)
 availabilityListDecoder = Decode.list availabilityDecoder
 
 roomScheduleDecoder : Decode.Decoder ScheduledMeeting
-roomScheduleDecoder = Decode.map3 ScheduledMeeting (Decode.field "email" Decode.string) (Decode.field "startDate" Decode.string) (Decode.field "endDate" Decode.string)
+roomScheduleDecoder = Decode.map3 ScheduledMeeting (Decode.field "organizerName" Decode.string) (Decode.field "timeBlocks" Decode.int) (Decode.field "timeRange" Decode.string)
 
 roomScheduleListDecoder : Decode.Decoder (List ScheduledMeeting)
 roomScheduleListDecoder = Decode.list roomScheduleDecoder
+
+
+---- Clock update ----
+getTime : Cmd Msg
+getTime = Time.now |> Task.perform OnTime

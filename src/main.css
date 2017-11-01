@@ -7,11 +7,27 @@ body {
   padding-top: 54px;
 }
 
+.clock {
+  margin-top: 3%;
+  text-align: center;
+  font-size: 300%;
+}
+
+.meeting-block {
+  display: inline-block;
+  border-right: 1px solid white;
+  padding: 5px;
+  height: 150px;
+}
+
+.room-timeline {
+  margin-top: 3%;
+  overflow: auto;
+  white-space: nowrap;
+}
+
 .room-card {
-  margin-top: 20px;
-  margin-bottom: 40px;
-  margin-left: 40px;
-  margin-right: 20px;
+  margin: 20px 20px 40px 40px;
   min-height: 104px;
 }
 
