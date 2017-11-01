@@ -59,9 +59,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ headerView
-        , legendView
-        , keyView
-        , listMeetingRooms model.meetingRooms
+        , conferenceRooms model.meetingRooms
+        , wellnessRooms model.meetingRooms
         , footerView
         ]
 
@@ -118,35 +117,48 @@ keyView =
 meetingRoomView : MeetingRoom -> Html Msg
 meetingRoomView room =
     div [class "col-sm-3"] [
-        div [class (roomStatus room.available)] 
-        [ div [class "card-body"] 
-            [ Html.h4 [class "card-title"] [text room.roomName],
-              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room.available room.nextAvailable room.nextMeeting)]
+        div [class (roomStatus room.available room.occupied)] 
+        [ div [class (roomHeader room.available room.occupied)] 
+         [  Html.h4 [class "card-title"] [text room.roomName] ]
+          ,div [class "card-block slalom-card-body"] [
+              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room.available room.nextAvailable room.nextMeeting), isOccupied room.occupied ]
             ]
         ]
-    ]
+        ]
 
 getNextAvailMeetingString : Bool -> String -> String -> String
 getNextAvailMeetingString available nextAvailable nextMeeting =
     case available of
         True ->
-            String.concat ["Booked at ", nextMeeting]
+            String.concat [" Booked at ", nextMeeting]
         False ->
-            String.concat ["Open at ", nextAvailable]
+            String.concat [" Open at ", nextAvailable]
 
 listMeetingRooms : List MeetingRoom -> Html Msg
 listMeetingRooms rooms =
     let
         roomsView = List.map meetingRoomView rooms
     in
-        div [class "row"]
+        div [class "row room-container"]
             roomsView
 
+conferenceRooms : List MeetingRoom -> Html Msg
+conferenceRooms rooms =
+    div [] 
+        [ Html.h2 [class "conference-rooms"] [text "Conference Rooms"]
+        , listMeetingRooms rooms
+        ]
+wellnessRooms : List MeetingRoom -> Html Msg
+wellnessRooms rooms =
+    div [] 
+        [ Html.h2 [class "conference-rooms"] [text "Wellness Rooms"]
+        , listMeetingRooms rooms
+        ]
 headerView : Html Msg
 headerView = 
     div [class "navbar navbar-expand-lg navbar-light nav-bar fixed-top"] [
         div [class "container"] [
-            Html.a [class "navbar-brand text-white", href "#"] [text "Hodor"]
+            Html.a [class "navbar-brand text-white", href "#"] [text "Slalom-Hodor"]
         ]
     ]
 
@@ -163,17 +175,41 @@ footerView : Html Msg
 footerView =
     div [class "py-5 nav-bar"]
         [ div [class "container"] [
-            Html.p [class "m-0 text-center text-white"] [text "Hodor 2017"]
+            Html.p [class "m-0 text-center text-white"] [text "Slalom-Hodor 2017"]
         ]
         ]
 
-roomStatus : Bool -> String
-roomStatus status = 
-    case status of
+roomStatus : Bool -> Bool -> String
+roomStatus available occupied = 
+    case (available, occupied) of
+        (True, False) ->
+            "card slalom-card-open"
+        (False, True) ->
+            "card slalom-card-booked"
+        (True, True) ->
+            "card slalom-card-open-occupied"
+        (False, False) ->
+            "card slalom-card-booked-vacant"
+
+roomHeader : Bool -> Bool -> String
+roomHeader available occupied =
+    case (available, occupied) of
+        (True, False) ->
+            "card-header slalom-card-header-open"
+        (False, True) ->
+            "card-header slalom-card-header-booked"
+        (False, False) ->
+            "card-header slalom-card-header-booked-vacant"
+        (True, True) ->
+            "card-header slalom-card-header-open-occupied"
+
+isOccupied : Bool -> Html Msg
+isOccupied occupied =
+    case occupied of 
         False ->
-            "room-card room-state-booked"
+            Html.br [] []
         True ->
-            "room-card room-state-not-booked"
+            Html.span [class "fa fa-2x fa-users occupied"] []
 
 roomStatusDescription : RoomState -> String
 roomStatusDescription status =
