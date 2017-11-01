@@ -27,7 +27,7 @@ page model =
         Models.HomeRoute ->
             homePage model
         Models.RoomRoute roomName ->
-            roomPage model roomName
+            roomPage model
         Models.NotFoundRoute ->
             notFoundPage
 
@@ -40,13 +40,23 @@ homePage model =
         , footerView
         ]
 
-roomPage : Model -> String -> Html Msg
-roomPage model roomName =
+roomPage : Model -> Html Msg
+roomPage model =
     div []
-        [ headerView roomName
+        [ roomHeaderView model.roomSchedule.meetingRoom
         , currentTimeView model.time
-        , listScheduledMeetings model.roomSchedule
+        , listScheduledMeetings model.roomSchedule.meetings
         ]
+
+roomHeaderView : MeetingRoom -> Html Msg
+roomHeaderView roomInfo =
+    div [class "room-header", style [("background-color", (roomInfo.available |> deriveRoomStateSimple |> deriveRoomStateColor))]]
+        [ text roomInfo.roomName ]
+
+currentTimeView : Float -> Html Msg
+currentTimeView time =
+    div [class "clock"]
+        [ time |> Date.fromTime |> toString |> (slice 17 22) |> text ]
 
 listScheduledMeetings : List ScheduledMeeting -> Html Msg
 listScheduledMeetings meetingData =
@@ -62,11 +72,6 @@ scheduledMeetingView meeting =
         [ Html.h6 [] [text meeting.organizerName]
         , Html.h6 [] [text meeting.timeRange]
         ]
-
-currentTimeView : Float -> Html Msg
-currentTimeView time =
-    div [class "clock"]
-        [ time |> Date.fromTime |> toString |> (slice 17 22) |> text ]
 
 notFoundPage : Html Msg
 notFoundPage =
@@ -166,6 +171,34 @@ footerView =
                 Html.p [class "m-0 text-center text-white"] [text "Hodor 2017"]
             ]
         ]
+
+-- Temporary method that doesn't take into account whether or not a room is occupied since we don't have access to that data currently
+deriveRoomStateSimple : Bool -> RoomState
+deriveRoomStateSimple available =
+    case available of
+        True -> NotBookedAndVacant
+        False -> BookedAndOccupied
+
+deriveRoomState : Bool -> Bool -> RoomState
+deriveRoomState booked occupied =
+    case booked of
+        True ->
+            case occupied of
+                True -> BookedAndOccupied
+                False -> BookedAndVacant
+        False ->
+            case occupied of
+                True -> NotBookedAndOccupied
+                False -> NotBookedAndVacant
+
+deriveRoomStateColor : RoomState -> String
+deriveRoomStateColor state =
+    case state of
+        BookedAndOccupied -> "var(--BookedAndOccupied)"
+        BookedAndVacant -> "var(--BookedAndVacant)"
+        NotBookedAndOccupied -> "var(--NotBookedAndOccupied)"
+        NotBookedAndVacant -> "var(--NotBookedAndVacant)"
+
 
 roomStatus : Bool -> String
 roomStatus status =

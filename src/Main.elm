@@ -14,9 +14,9 @@ import View exposing (view)
 
 
 -- This is so ugly but I don't know a better way to do it
-init : (List MeetingRoom) -> String -> (List ScheduledMeeting) -> Route -> Bool -> Float -> ( Model, Cmd Msg )
-init meetingRooms roomName roomSchedule route autoUpdate time =
-    ( Model meetingRooms roomName roomSchedule route autoUpdate time, getAvailability meetingRooms )
+init : (List MeetingRoom) -> RoomSchedule -> Route -> Bool -> Float -> ( Model, Cmd Msg )
+init meetingRooms roomSchedule route autoUpdate time =
+    ( Model meetingRooms roomSchedule route autoUpdate time, getAvailability meetingRooms )
 
 
 
@@ -24,7 +24,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { view = view
-        , init = init [] "" [] HomeRoute False 0
+        , init = init [] (RoomSchedule (MeetingRoom "" False "" "") []) HomeRoute False 0
         , update = update
         , subscriptions = subscriptions
         }

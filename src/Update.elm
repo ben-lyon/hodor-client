@@ -11,7 +11,7 @@ update msg model =
         LoadAvailability ->
             (model, getAvailability model.meetingRooms)
         LoadedAvailability (Ok meetingRooms) ->
-            ( Model meetingRooms "" [] HomeRoute False 0, Cmd.none )
+            ( Model meetingRooms (RoomSchedule (MeetingRoom "" False "" "") []) HomeRoute False 0, Cmd.none )
         LoadedAvailability (Err _) ->
             ( model, Cmd.none )
         OnLocationChange location ->
@@ -21,7 +21,7 @@ update msg model =
             in
                 ( { model | route = newRoute }, Cmd.none )
         LoadRoomSchedule roomName ->
-            ( { model | roomName = roomName, route = RoomRoute roomName, autoUpdate = True}, getRoomInfo roomName )
+            ( { model | route = RoomRoute roomName, autoUpdate = True}, getRoomInfo roomName )
         LoadedRoomSchedule (Ok roomSchedule) ->
             ( { model | roomSchedule = roomSchedule }, getTime )
         LoadedRoomSchedule (Err _) ->
@@ -29,4 +29,4 @@ update msg model =
         OnTime t ->
             ( { model | time = t }, Cmd.none )
         ReloadRoomSchedule t ->
-            ( { model | time = t }, getRoomInfo model.roomName )
+            ( { model | time = t }, getRoomInfo model.roomSchedule.meetingRoom.roomName )

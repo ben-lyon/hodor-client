@@ -7,7 +7,7 @@ import Task exposing (perform)
 import Time exposing (now)
 
 import Msgs exposing (..)
-import Models exposing (MeetingRoom, ScheduledMeeting)
+import Models exposing (MeetingRoom, ScheduledMeeting, RoomSchedule)
 
 ---- HTTP ----
 
@@ -26,7 +26,7 @@ getRoomInfo roomName =
         url =
             concat ["http://localhost:8080/meetingRoom/lookup/", (split " " roomName |> join "%20"), "/schedule"]
     in
-        Http.send LoadedRoomSchedule (Http.get url roomScheduleListDecoder)
+        Http.send LoadedRoomSchedule (Http.get url roomScheduleDecoder)
 
 ---- JSON ----
 availabilityDecoder : Decode.Decoder MeetingRoom
@@ -35,11 +35,14 @@ availabilityDecoder = Decode.map4 MeetingRoom (Decode.field "roomName" Decode.st
 availabilityListDecoder : Decode.Decoder (List MeetingRoom)
 availabilityListDecoder = Decode.list availabilityDecoder
 
-roomScheduleDecoder : Decode.Decoder ScheduledMeeting
-roomScheduleDecoder = Decode.map3 ScheduledMeeting (Decode.field "organizerName" Decode.string) (Decode.field "timeBlocks" Decode.int) (Decode.field "timeRange" Decode.string)
+roomScheduleDecoder : Decode.Decoder RoomSchedule
+roomScheduleDecoder = Decode.map2 RoomSchedule (Decode.field "currentAvailability" availabilityDecoder) (Decode.field "schedule" scheduledMeetingListDecoder)
 
-roomScheduleListDecoder : Decode.Decoder (List ScheduledMeeting)
-roomScheduleListDecoder = Decode.list roomScheduleDecoder
+scheduledMeetingDecoder : Decode.Decoder ScheduledMeeting
+scheduledMeetingDecoder = Decode.map3 ScheduledMeeting (Decode.field "organizerName" Decode.string) (Decode.field "timeBlocks" Decode.int) (Decode.field "timeRange" Decode.string)
+
+scheduledMeetingListDecoder : Decode.Decoder (List ScheduledMeeting)
+scheduledMeetingListDecoder = Decode.list scheduledMeetingDecoder
 
 
 ---- Clock update ----
