@@ -130,14 +130,20 @@ getNextAvailMeetingString : Bool -> String -> String -> String
 getNextAvailMeetingString available nextAvailable nextMeeting =
     case available of
         True ->
-            String.concat [" Booked at ", nextMeeting]
+            if String.isEmpty nextMeeting then
+                " Open rest of day"
+            else 
+                String.concat [" Booked at ", nextMeeting]
         False ->
-            String.concat [" Open at ", nextAvailable]
+            if String.isEmpty nextAvailable then
+                " Booked rest of day"
+            else
+                String.concat [" Open at ", nextAvailable]
 
 listMeetingRooms : List MeetingRoom -> Html Msg
 listMeetingRooms rooms =
     let
-        roomsView = List.map meetingRoomView rooms
+        roomsView = List.map meetingRoomView ((List.filter openAndVacant rooms)++(List.filter openAndOccupied rooms)++(List.filter bookedAndVacant rooms)++(List.filter bookedAndOccupied rooms))
     in
         div [class "row room-container"]
             roomsView
@@ -145,20 +151,38 @@ listMeetingRooms rooms =
 conferenceRooms : List MeetingRoom -> Html Msg
 conferenceRooms rooms =
     div [] 
-        [ Html.h2 [class "conference-rooms"] [text "Conference Rooms"]
-        , listMeetingRooms rooms
+        [ Html.h3 [class "conference-rooms"] [text "Conference Rooms"]
+        , Html.hr [][]
+        , listMeetingRooms (List.filter filterConfernceRooms rooms)
         ]
 wellnessRooms : List MeetingRoom -> Html Msg
 wellnessRooms rooms =
     div [] 
-        [ Html.h2 [class "conference-rooms"] [text "Wellness Rooms"]
-        , listMeetingRooms rooms
+        [ Html.h3 [class "conference-rooms"] [text "Wellness Rooms"]
+        , Html.hr [][]
+        , listMeetingRooms (List.filter filterWellnessRooms rooms)
         ]
 headerView : Html Msg
 headerView = 
-    div [class "navbar navbar-expand-lg navbar-light nav-bar fixed-top"] [
+    Html.nav [class "navbar navbar-toggleable-md navbar-expand-lg navbar-light nav-bar fixed-top"] [
         div [class "container"] [
-            Html.a [class "navbar-brand text-white", href "#"] [text "Slalom-Hodor"]
+           Html.button [class "navbar-toggler navbar-toggler-right", Html.Attributes.type_ "button", dataToggle "collapse", dataTarget "#navbarNav", ariaExpanded False, ariaControls "navbarNav"] [
+               Html.span [class "navbar-toggler-icon"][]
+            ]
+            ,Html.a [class "navbar-brand text-white", href "#first"] [
+                Html.span [class "d-inline-block align-top fa fa-2x fa-address-book-o"] []
+            ],
+            div [class "collapse navbar-collapse", id "navbarNav"] [
+            Html.ul [class "navbar-nav"] 
+            [
+                Html.li [class "nav-item"] [
+                    Html.a [class "nav-link text-white active", href "#"][text "Slalom-Hodor"]
+                ],
+                Html.li [class "nav-item"] [
+                    Html.a [class "nav-link text-white active", href "#"][text "about"]
+                ]
+            ]
+            ]
         ]
     ]
 
@@ -243,19 +267,29 @@ availabilityListDecoder : Decode.Decoder (List MeetingRoom)
 availabilityListDecoder = Decode.list availabilityDecoder
 
 ---- Filters ----
-openAndVacant : MeetingRoom -> Maybe MeetingRoom
-openAndVacant meetingRoom =
-    if meetingRoom.available && not meetingRoom.occupied then
-        Just meetingRoom
-    else
-        Nothing
+filterWellnessRooms : MeetingRoom -> Bool
+filterWellnessRooms meetingRoom =
+    String.startsWith "Wellness" meetingRoom.roomName
 
-bookedAndVacant : MeetingRoom -> Maybe MeetingRoom
+filterConfernceRooms : MeetingRoom -> Bool
+filterConfernceRooms meetingRoom =
+    not (String.startsWith "Wellness" meetingRoom.roomName)
+
+openAndVacant : MeetingRoom -> Bool
+openAndVacant meetingRoom =
+    meetingRoom.available && not meetingRoom.occupied 
+
+bookedAndVacant : MeetingRoom -> Bool
 bookedAndVacant meetingRoom =
-    if not meetingRoom.available && not meetingRoom.occupied then
-        Just meetingRoom
-    else
-        Nothing
+    not meetingRoom.available && not meetingRoom.occupied
+
+openAndOccupied : MeetingRoom -> Bool
+openAndOccupied meetingRoom =
+    meetingRoom.available && meetingRoom.occupied
+
+bookedAndOccupied : MeetingRoom -> Bool
+bookedAndOccupied meetingRoom =
+    not meetingRoom.available && meetingRoom.occupied
 
 ---- Attributes ----
 boolAttribute : String -> Bool -> Attribute msg
@@ -266,6 +300,9 @@ dataToggle : String -> Attribute Msg
 dataToggle = 
     attribute "data-toggle"
 
+dataTarget : String -> Attribute Msg
+dataTarget =
+    attribute "data-target"
 
 ariaHasPopUp : Bool -> Attribute Msg
 ariaHasPopUp = 
@@ -274,6 +311,10 @@ ariaHasPopUp =
 ariaExpanded : Bool -> Attribute Msg
 ariaExpanded = 
     boolAttribute "aria-expanded"
+
+ariaControls : String -> Attribute Msg
+ariaControls =
+    attribute "aria-controls"
 ---- PROGRAM ----
 
 
