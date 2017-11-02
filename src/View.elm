@@ -46,11 +46,12 @@ roomPage model =
         [ roomHeaderView model.roomSchedule.meetingRoom
         , currentTimeView model.time
         , listScheduledMeetings model.roomSchedule.meetings
+        , Html.h4 [class "next-avail"] [text (getNextAvailMeetingString model.roomSchedule.meetingRoom) ]
         ]
 
 roomHeaderView : MeetingRoom -> Html Msg
 roomHeaderView roomInfo =
-    div [class "room-header", style [("background-color", (roomInfo.available |> deriveRoomStateSimple |> deriveRoomStateColor))]]
+    div [class "room-header", style [("color", (roomInfo.available |> deriveRoomStateSimple |> deriveRoomStateColor))]]
         [ text roomInfo.roomName ]
 
 currentTimeView : Float -> Html Msg
@@ -134,18 +135,18 @@ meetingRoomView room =
         div [class (roomStatus room.available)]
         [ div [class "card-body", onClick ( LoadRoomSchedule room.roomName )]
             [ Html.h4 [class "card-title"] [text room.roomName],
-              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room.available room.nextAvailable room.nextMeeting)]
+              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room)]
             ]
         ]
     ]
 
-getNextAvailMeetingString : Bool -> String -> String -> String
-getNextAvailMeetingString available nextAvailable nextMeeting =
-    case available of
+getNextAvailMeetingString : MeetingRoom -> String
+getNextAvailMeetingString room =
+    case room.available of
         True ->
-            String.concat ["Booked at ", nextMeeting]
+            String.concat ["Booked at ", room.nextMeeting]
         False ->
-            String.concat ["Open at ", nextAvailable]
+            String.concat ["Open at ", room.nextAvailable]
 
 listMeetingRooms : List MeetingRoom -> Html Msg
 listMeetingRooms rooms =

@@ -20,10 +20,11 @@ body {
   text-align: center;
   font-size: 450%;
   width: 100%;
+  background-color: #343a40;
 }
 
 .clock {
-  margin-top: 7.5%;
+  margin-top: 7%;
   text-align: center;
   font-size: 300%;
 }
@@ -39,6 +40,11 @@ body {
   margin-top: 3%;
   overflow: auto;
   white-space: nowrap;
+}
+
+.next-avail {
+  text-align: center;
+  margin-top: 3%;
 }
 
 .room-card {
