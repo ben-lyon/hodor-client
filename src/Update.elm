@@ -11,7 +11,7 @@ update msg model =
         LoadAvailability ->
             (model, getAvailability model.meetingRooms)
         LoadedAvailability (Ok meetingRooms) ->
-            ( Model meetingRooms (RoomSchedule (MeetingRoom "" False "" "") []) HomeRoute False 0, Cmd.none )
+            ( Model meetingRooms (RoomSchedule (MeetingRoom "" False "" "" False) []) HomeRoute False 0, Cmd.none )
         LoadedAvailability (Err _) ->
             ( model, Cmd.none )
         OnLocationChange location ->

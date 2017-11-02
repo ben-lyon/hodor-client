@@ -30,7 +30,7 @@ getRoomInfo roomName =
 
 ---- JSON ----
 availabilityDecoder : Decode.Decoder MeetingRoom
-availabilityDecoder = Decode.map4 MeetingRoom (Decode.field "roomName" Decode.string) (Decode.field "available" Decode.bool) (Decode.field "nextAvailable" Decode.string) (Decode.field "nextMeeting" Decode.string)
+availabilityDecoder = Decode.map5 MeetingRoom (Decode.field "roomName" Decode.string) (Decode.field "available" Decode.bool) (Decode.field "nextAvailable" Decode.string) (Decode.field "nextMeeting" Decode.string) (Decode.field "occupied" Decode.bool)
 
 availabilityListDecoder : Decode.Decoder (List MeetingRoom)
 availabilityListDecoder = Decode.list availabilityDecoder

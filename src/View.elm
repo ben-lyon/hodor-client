@@ -25,23 +25,143 @@ page : Model -> Html Msg
 page model =
     case model.route of
         Models.HomeRoute ->
-            homePage model
+            homeView model
         Models.RoomRoute roomName ->
-            roomPage model
+            roomView model
         Models.NotFoundRoute ->
-            notFoundPage
+            notFoundView
 
-homePage : Model -> Html Msg
-homePage model =
+
+----- HOME PAGE -----
+
+homeView : Model -> Html Msg
+homeView model =
     div []
-        [ headerView "Hodor"
-        , keyView
-        , listMeetingRooms model.meetingRooms
+        [ headerView
+        , conferenceRooms model.meetingRooms
+        , wellnessRooms model.meetingRooms
+        , aboutModal
         , footerView
         ]
 
-roomPage : Model -> Html Msg
-roomPage model =
+headerView : Html Msg
+headerView =
+    Html.nav [class "navbar navbar-toggleable-md navbar-expand-lg navbar-light slalom-blue fixed-top"] [
+        div [class "container"] [
+           Html.button [class "navbar-toggler navbar-toggler-right", Html.Attributes.type_ "button", dataToggle "collapse", dataTarget "#navbarNav", ariaExpanded False, ariaControls "navbarNav"] [
+               Html.span [class "navbar-toggler-icon fa-icon-color"][]
+            ]
+            ,Html.a [class "navbar-brand text-white", href "#first"] [
+                Html.span [class "d-inline-block align-top fa fa-2x fa-address-book-o"] []
+            ],
+            div [class "collapse navbar-collapse", id "navbarNav"] [
+            Html.ul [class "navbar-nav"]
+            [
+                Html.li [class "nav-item"] [
+                    Html.a [class "nav-link text-white active", href "#"][text "Slalom-Hodor"]
+                ],
+                Html.li [class "nav-item"] [
+                    Html.a [class "nav-link text-white active", href "#", dataToggle "modal", dataTarget "#Modal2"][text "about"]
+                ]
+            ]
+            ]
+        ]
+    ]
+
+conferenceRooms : List MeetingRoom -> Html Msg
+conferenceRooms rooms =
+    div []
+        [ Html.h3 [class "conference-rooms"] [text "Conference Rooms"]
+        , Html.hr [][]
+        , listMeetingRooms (List.filter filterConferenceRooms rooms)
+        ]
+
+wellnessRooms : List MeetingRoom -> Html Msg
+wellnessRooms rooms =
+    div []
+        [ Html.h3 [class "conference-rooms"] [text "Wellness Rooms"]
+        , Html.hr [][]
+        , listMeetingRooms (List.filter filterWellnessRooms rooms)
+        ]
+
+listMeetingRooms : List MeetingRoom -> Html Msg
+listMeetingRooms rooms =
+    let
+        roomsView = List.map meetingRoomView ((List.filter openAndVacant rooms)++(List.filter openAndOccupied rooms)++(List.filter bookedAndVacant rooms)++(List.filter bookedAndOccupied rooms))
+    in
+        div [class "row room-container"]
+            roomsView
+
+meetingRoomView : MeetingRoom -> Html Msg
+meetingRoomView room =
+    div [class "col-sm-3"] [
+        div [class (roomStatus room.available room.occupied)]
+        [ div [class (roomHeader room.available room.occupied), onClick ( LoadRoomSchedule room.roomName )]
+         [  Html.h4 [class "card-title"] [text room.roomName] ]
+          ,div [class "card-block slalom-card-body"] [
+              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room), isOccupied room.occupied ]
+            ]
+        ]
+    ]
+
+roomHeader : Bool -> Bool -> String
+roomHeader available occupied =
+    case (available, occupied) of
+        (True, False) ->
+            "card-header slalom-card-header-open"
+        (False, True) ->
+            "card-header slalom-card-header-booked"
+        (False, False) ->
+            "card-header slalom-card-header-booked-vacant"
+        (True, True) ->
+            "card-header slalom-card-header-open-occupied"
+
+aboutModal : Html Msg
+aboutModal =
+    div [class "modal fade", id "Modal2", tabIndex "-1", role "dialog", ariaHidden True]
+    [ div [class "modal-dialog", role "document"]
+        [ div [class "modal-content"]
+            [ div [class "modal-header slalom-blue text-white"]
+                [ Html.h5 [class "modal-title", id "ModalLabel"] [text "About Slalom-Hodor"]
+                , Html.button [Html.Attributes.type_ "button", class "close", dataDismiss "modal", ariaLabel "Close"]
+                    [ Html.span [class "fa fa-times fa-icon-color", ariaHidden True] [] ]
+                ]
+            , div [class "modal-body"]
+                [roomLegend]
+            , div [class "modal-footer slalom-blue"]
+                [ Html.button [Html.Attributes.type_ "button", class "btn btn-info btn-md", dataDismiss "modal"] [text "Close"] ]
+            ]
+        ]
+    ]
+
+roomLegend : Html Msg
+roomLegend =
+    div [class "my-legend"]
+        [ div [class "legend-title"] [text "Room Status Key Legend"]
+        , div [class "legend-scale"]
+            [Html.ul [class "legend-labels"]
+                [ Html.li [] [Html.span [class "key-legend-open"][], text "Room is open in outlook and vacant"]
+                , Html.li [] [Html.span [class "key-legend-open-occupied"][], text "Room is open in outlook but occupied"]
+                , Html.li [] [Html.span [class "key-legend-booked-vacant"][], text "Room is booked in outlook but vacant"]
+                , Html.li [] [Html.span [class "key-legend-booked"][], text "Room is booked in outlook and occupied"]
+                ]
+            ]
+        , div [class "legend-source"] [text "Source: "
+        , Html.a [href "https://bitbucket.org/account/user/meeting-rooms-hackathon/projects/MRA"] [text "source code here"]]
+   ]
+
+footerView : Html Msg
+footerView =
+    div [class "py-5 slalom-blue"]
+        [ div [class "container"]
+            [ Html.p [class "m-0 text-center text-white"] [text "Slalom-Hodor 2017"] ]
+        ]
+
+
+----- ROOM PAGE -----
+
+roomView : Model -> Html Msg
+roomView model =
     div []
         [ roomHeaderView model.roomSchedule.meetingRoom
         , currentTimeView model.time
@@ -74,104 +194,30 @@ scheduledMeetingView meeting =
         , Html.h6 [] [text meeting.timeRange]
         ]
 
-notFoundPage : Html Msg
-notFoundPage =
+----- 404 PAGE -----
+
+notFoundView : Html Msg
+notFoundView =
     div []
         [ text "Page not found" ]
 
-timeSearchView : Html Msg
-timeSearchView =
-    div [class "row"] [
-        div [class "btn-group ml-2 time-dropdown"] [
-            button [type_ "button", class "btn btn-lg btn-secondary"] [text "Select Time"]
-            , button [type_ "button", class "btn btn-lg btn-secondary dropdown-toggle dropdown-toggle-split", dataToggle "dropdown", ariaHasPopUp True, ariaExpanded False] [Html.span [class "sr-only"] [text "Toggle Dropdown"]]
-            , div [class "dropdown-menu"] [
-                a [class "dropdown-item", href "#"] [text "11:30AM"]
-                , a [class "dropdown-item", href "#"] [text "12:00PM"]
-                , a [class "dropdown-item", href "#"] [text "12:30PM"]
-            ]
-        ]
-    ]
 
-keyView : Html Msg
-keyView =
-    div [class "row"] [
-        div [class "col-sm-3"] [
-            div [class "room-card room-state-not-booked"]
-            [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Open and Empty"]
-                ]
-            ]
-        ],
-
-        div [class "col-sm-3"] [
-            div [class "room-card room-state-not-booked-occupied"]
-            [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Open and Occupied"]
-                ]
-            ]
-        ],
-
-        div [class "col-sm-3"] [
-            div [class "room-card room-state-booked-not-occupied"]
-            [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Booked and Empty"]
-                ]
-            ]
-        ],
-
-        div [class "col-sm-3"] [
-            div [class "room-card room-state-booked"]
-            [ div [class "card-body"]
-                [ Html.h4 [class "card-title"] [text "Booked, Occupied"]
-                ]
-            ]
-        ]
-    ]
-
-meetingRoomView : MeetingRoom -> Html Msg
-meetingRoomView room =
-    div [class "col-sm-3"] [
-        div [class (roomStatus room.available)]
-        [ div [class "card-body", onClick ( LoadRoomSchedule room.roomName )]
-            [ Html.h4 [class "card-title"] [text room.roomName],
-              Html.h5 [class "card-title"] [text (getNextAvailMeetingString room)]
-            ]
-        ]
-    ]
+----- HELPER METHODS -----
 
 getNextAvailMeetingString : MeetingRoom -> String
 getNextAvailMeetingString room =
     case room.available of
         True ->
-            String.concat ["Booked at ", room.nextMeeting]
+            if String.isEmpty room.nextMeeting then
+                " Open rest of day"
+            else
+                String.concat [" Booked at ", room.nextMeeting]
         False ->
-            String.concat ["Open at ", room.nextAvailable]
+            if String.isEmpty room.nextAvailable then
+                " Booked rest of day"
+            else
+                String.concat [" Open at ", room.nextAvailable]
 
-listMeetingRooms : List MeetingRoom -> Html Msg
-listMeetingRooms rooms =
-    let
-        roomsView = List.map meetingRoomView rooms
-    in
-        div [class "row"]
-            roomsView
-
-headerView : String -> Html Msg
-headerView pageName =
-    div [class "navbar navbar-expand-lg navbar-dark bg-dark fixed-top"] [
-        div [class "container"] [
-            Html.a [class "navbar-brand", href "#"] [text pageName]
-        ]
-    ]
-
-footerView : Html Msg
-footerView =
-    div [class "py-5 bg-dark"]
-        [ div [class "container"]
-            [
-                Html.p [class "m-0 text-center text-white"] [text "Hodor 2017"]
-            ]
-        ]
 
 -- Temporary method that doesn't take into account whether or not a room is occupied since we don't have access to that data currently
 deriveRoomStateSimple : Bool -> RoomState
@@ -201,13 +247,17 @@ deriveRoomStateColor state =
         NotBookedAndVacant -> "var(--NotBookedAndVacant)"
 
 
-roomStatus : Bool -> String
-roomStatus status =
-    case status of
-        False ->
-            "room-card room-state-booked"
-        True ->
-            "room-card room-state-not-booked"
+roomStatus : Bool -> Bool -> String
+roomStatus available occupied =
+    case (available, occupied) of
+        (True, False) ->
+            "card slalom-card-open"
+        (False, True) ->
+            "card slalom-card-booked"
+        (True, True) ->
+            "card slalom-card-open-occupied"
+        (False, False) ->
+            "card slalom-card-booked-vacant"
 
 roomStatusDescription : RoomState -> String
 roomStatusDescription status =
@@ -221,6 +271,14 @@ roomStatusDescription status =
         NotBookedAndOccupied ->
             "Available but occupied"
 
+isOccupied : Bool -> Html Msg
+isOccupied occupied =
+    case occupied of
+        False ->
+            Html.br [] []
+        True ->
+            Html.span [class "fa fa-2x fa-users occupied"] []
+
 calculateMeetingLength : Int -> String
 calculateMeetingLength timeBlocks =
     append (toString (timeBlocks * 175)) "px"
@@ -228,9 +286,35 @@ calculateMeetingLength timeBlocks =
 calculateMeetingBlockColor : String -> String
 calculateMeetingBlockColor meetingName =
     if meetingName == "Open" then
-        "#86E965"
+        "var(--NotBookedAndVacant)"
     else
-        "#ef7777"
+        "var(--BookedAndOccupied)"
+
+
+---- Filters ----
+filterWellnessRooms : MeetingRoom -> Bool
+filterWellnessRooms meetingRoom =
+    String.startsWith "Wellness" meetingRoom.roomName
+
+filterConferenceRooms : MeetingRoom -> Bool
+filterConferenceRooms meetingRoom =
+    not (String.startsWith "Wellness" meetingRoom.roomName)
+
+openAndVacant : MeetingRoom -> Bool
+openAndVacant meetingRoom =
+    meetingRoom.available && not meetingRoom.occupied
+
+bookedAndVacant : MeetingRoom -> Bool
+bookedAndVacant meetingRoom =
+    not meetingRoom.available && not meetingRoom.occupied
+
+openAndOccupied : MeetingRoom -> Bool
+openAndOccupied meetingRoom =
+    meetingRoom.available && meetingRoom.occupied
+
+bookedAndOccupied : MeetingRoom -> Bool
+bookedAndOccupied meetingRoom =
+    not meetingRoom.available && meetingRoom.occupied
 
 
 ---- Attributes ----
@@ -242,6 +326,9 @@ dataToggle : String -> Attribute Msg
 dataToggle =
     attribute "data-toggle"
 
+dataTarget : String -> Attribute Msg
+dataTarget =
+    attribute "data-target"
 
 ariaHasPopUp : Bool -> Attribute Msg
 ariaHasPopUp =
@@ -250,3 +337,27 @@ ariaHasPopUp =
 ariaExpanded : Bool -> Attribute Msg
 ariaExpanded =
     boolAttribute "aria-expanded"
+
+ariaControls : String -> Attribute Msg
+ariaControls =
+    attribute "aria-controls"
+
+ariaLabel : String -> Attribute Msg
+ariaLabel =
+    attribute "aria-label"
+
+ariaHidden : Bool -> Attribute Msg
+ariaHidden =
+    boolAttribute "aria-hidden"
+
+role : String -> Attribute Msg
+role =
+    attribute "role"
+
+dataDismiss : String -> Attribute Msg
+dataDismiss =
+    attribute "data-dismiss"
+
+tabIndex : String -> Attribute Msg
+tabIndex =
+    attribute "tabindex"

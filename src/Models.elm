@@ -13,7 +13,8 @@ type alias MeetingRoom =
         roomName : String,
         available : Bool,
         nextAvailable: String,
-        nextMeeting: String
+        nextMeeting: String,
+        occupied: Bool
     }
 type alias RoomSchedule =
     {

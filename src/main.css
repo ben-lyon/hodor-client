@@ -47,21 +47,33 @@ body {
   margin-top: 3%;
 }
 
+.room-container {
+  margin-top: 15px;
+  margin-left: 30px !important;
+  margin-right: 30px !important;
+}
+
 .room-card {
   margin: 20px 20px 40px 40px;
   min-height: 104px;
 }
-
+.key-card {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 40px;
+  margin-right: 20px;
+  min-height: 68px;
+  border-color: #241C1C;
+  text-align: center;
+}
 .time-dropdown {
   margin: auto;
   width: 50%;
   padding: 10px;
 }
 
-@media (min-width: 992px) {
-  body {
-    padding-top: 56px;
-  }
+.slalom-blue {
+  background-color: #0070CD;
 }
 
 .portfolio-item {
@@ -72,30 +84,125 @@ body {
   margin-bottom: 30px;
 }
 
-.room-state-booked {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-    border-radius: 5px;
-    background-color: var(--BookedAndOccupied);
+.key-legend {
+  background-color: rgb(250, 249, 242);
+  border-radius: 5px;
 }
 
-.room-state-not-booked {
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  transition: 0.3s;
-  border-radius: 5px;
-  background-color: var(--NotBookedAndVacant);
+.bottom {
+  border-bottom: 0.5px solid #DBD6D6;
 }
 
-.room-state-not-booked-occupied {
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  transition: 0.3s;
-  border-radius: 5px;
-  background-color: var(--NotBookedAndOccupied);
+.conference-rooms {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+  margin-left: 30px !important;
+  margin-right: 30px !important;
 }
 
-.room-state-booked-not-occupied {
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  transition: 0.3s;
-  border-radius: 5px;
-  background-color: var(--BookedAndVacant);
+.slalom-card-body {
+  margin: 15px 10px;
 }
+.slalom-card-booked {
+  font-family: helvetica, sans-serif !important;
+  min-width: 55% !important;
+  margin-bottom: 30px !important;
+  border-color:  #E02F29 !important;
+}
+
+.slalom-card-open {
+  font-family: helvetica, sans-serif !important;
+  min-width: 55% !important;
+  margin-bottom: 30px;
+  border-color: #7DE859 !important;
+}
+.slalom-card-header-open {
+  background-color: var(--NotBookedAndVacant) !important;
+  color: white !important;
+}
+.slalom-card-header-booked {
+  background-color:  var(--BookedAndOccupied) !important;
+  color: white !important;
+}
+.slalom-card-header-booked-vacant {
+  background-color:  var(--BookedAndVacant) !important;
+  color: white !important;
+}
+.slalom-card-header-open-occupied {
+  background-color:  var(--NotBookedAndOccupied) !important;
+  color: white !important;
+}
+
+.key-legend-booked {
+  background:  var(--BookedAndOccupied);
+}
+.key-legend-open {
+  background: var(--NotBookedAndVacant);
+}
+.key-legend-open-occupied {
+  background:  var(--NotBookedAndOccupied);
+}
+.key-legend-booked-vacant {
+  background:  var(--BookedAndVacant);
+}
+
+.slalom-card-open-occupied {
+  font-family: helvetica, sans-serif !important;
+  min-width: 55%;
+  margin-bottom: 30px;
+  border-color: #FAE566!important;
+}
+.slalom-card-booked-vacant {
+  font-family: helvetica, sans-serif !important;
+  min-width: 55%;
+  margin-bottom: 30px;
+  border-color: #ff803a !important;
+}
+
+.occupied {
+  float: right;
+  color: grey;
+}
+
+.fa-icon-color {
+  color: white !important;
+}
+
+.my-legend .legend-title {
+  text-align: left;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 90%;
+  }
+.my-legend .legend-scale ul {
+  margin: 0;
+  margin-bottom: 5px;
+  padding: 0;
+  float: left;
+  list-style: none;
+  }
+.my-legend .legend-scale ul li {
+  font-size: 80%;
+  list-style: none;
+  margin-left: 0;
+  line-height: 18px;
+  margin-bottom: 2px;
+  }
+.my-legend ul.legend-labels li span {
+  display: block;
+  float: left;
+  height: 16px;
+  width: 30px;
+  margin-right: 5px;
+  margin-left: 0;
+  border: 1px solid #999;
+  }
+.my-legend .legend-source {
+  font-size: 70%;
+  color: #999;
+  clear: both;
+  }
+.my-legend a {
+  color: #777;
+  }
