@@ -1,3 +1,10 @@
+:root {
+  --BookedAndOccupied: #ef7777;
+  --BookedAndVacant: #ffc107;
+  --NotBookedAndOccupied: #fff65f;
+  --NotBookedAndVacant: #32c954;
+}
+
 img {
   margin: 20px 0;
   max-width: 200px;
@@ -7,6 +14,39 @@ body {
   padding-top: 54px;
 }
 
+.room-header {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  font-size: 450%;
+  width: 100%;
+  background-color: #343a40;
+}
+
+.clock {
+  margin-top: 7%;
+  text-align: center;
+  font-size: 300%;
+}
+
+.meeting-block {
+  display: inline-block;
+  border-right: 1px solid white;
+  padding: 5px;
+  height: 150px;
+}
+
+.room-timeline {
+  margin-top: 3%;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.next-avail {
+  text-align: center;
+  margin-top: 3%;
+}
+
 .room-container {
   margin-top: 15px;
   margin-left: 30px !important;
@@ -14,10 +54,7 @@ body {
 }
 
 .room-card {
-  margin-top: 20px;
-  margin-bottom: 40px;
-  margin-left: 40px;
-  margin-right: 20px;
+  margin: 20px 20px 40px 40px;
   min-height: 104px;
 }
 .key-card {
@@ -51,9 +88,10 @@ body {
   background-color: rgb(250, 249, 242);
   border-radius: 5px;
 }
+
 .bottom {
   border-bottom: 0.5px solid #DBD6D6;
-} 
+}
 
 .conference-rooms {
   font-family: Arial, Helvetica, sans-serif;
@@ -64,65 +102,62 @@ body {
 }
 
 .slalom-card-body {
-  margin-top: 15px;
-  margin-bottom: 15px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 15px 10px;
 }
 .slalom-card-booked {
-  font-family: helvetica !important;
+  font-family: helvetica, sans-serif !important;
   min-width: 55% !important;
   margin-bottom: 30px !important;
   border-color:  #E02F29 !important;
 }
 
 .slalom-card-open {
-  font-family: helvetica !important;
+  font-family: helvetica, sans-serif !important;
   min-width: 55% !important;
   margin-bottom: 30px;
-  border-color: #7DE859 !important;
+  border-color: #28A745 !important;
 }
 .slalom-card-header-open {
-  background-color: #7DE859 !important;
+  background-color: var(--NotBookedAndVacant) !important;
   color: white !important;
 }
 .slalom-card-header-booked {
-  background-color:  #E02F29 !important;
+  background-color:  var(--BookedAndOccupied) !important;
   color: white !important;
 }
 .slalom-card-header-booked-vacant {
-  background-color:  #ff803a !important;
+  background-color:  var(--BookedAndVacant) !important;
   color: white !important;
 }
 .slalom-card-header-open-occupied {
-  background-color:  #FAE566 !important;
+  background-color:  var(--NotBookedAndOccupied) !important;
   color: white !important;
 }
 
 .key-legend-booked {
-  background:  #E02F29;
+  background:  var(--BookedAndOccupied);
 }
 .key-legend-open {
-  background: #7DE859;
+  background: var(--NotBookedAndVacant);
 }
 .key-legend-open-occupied {
-  background:  #FAE566;
+  background:  var(--NotBookedAndOccupied);
 }
 .key-legend-booked-vacant {
-  background:  #ff803a;
+  background:  var(--BookedAndVacant);
 }
 
 .slalom-card-open-occupied {
-  font-family: helvetica !important;
+  font-family: helvetica, sans-serif !important;
   min-width: 55%;
   margin-bottom: 30px;
   border-color: #FAE566!important;
 }
 .slalom-card-booked-vacant {
-  font-family: helvetica !important;
+  font-family: helvetica, sans-serif !important;
   min-width: 55%;
   margin-bottom: 30px;
-  border-color: #ff803a !important;
+  border-color: #E0A800 !important;
 }
 
 .occupied {
