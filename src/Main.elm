@@ -61,6 +61,7 @@ view model =
         [ headerView
         , conferenceRooms model.meetingRooms
         , wellnessRooms model.meetingRooms
+        , aboutModal
         , footerView
         ]
 
@@ -164,10 +165,10 @@ wellnessRooms rooms =
         ]
 headerView : Html Msg
 headerView = 
-    Html.nav [class "navbar navbar-toggleable-md navbar-expand-lg navbar-light nav-bar fixed-top"] [
+    Html.nav [class "navbar navbar-toggleable-md navbar-expand-lg navbar-light slalom-blue fixed-top"] [
         div [class "container"] [
            Html.button [class "navbar-toggler navbar-toggler-right", Html.Attributes.type_ "button", dataToggle "collapse", dataTarget "#navbarNav", ariaExpanded False, ariaControls "navbarNav"] [
-               Html.span [class "navbar-toggler-icon"][]
+               Html.span [class "navbar-toggler-icon fa-icon-color"][]
             ]
             ,Html.a [class "navbar-brand text-white", href "#first"] [
                 Html.span [class "d-inline-block align-top fa fa-2x fa-address-book-o"] []
@@ -179,7 +180,7 @@ headerView =
                     Html.a [class "nav-link text-white active", href "#"][text "Slalom-Hodor"]
                 ],
                 Html.li [class "nav-item"] [
-                    Html.a [class "nav-link text-white active", href "#"][text "about"]
+                    Html.a [class "nav-link text-white active", href "#", dataToggle "modal", dataTarget "#Modal2"][text "about"]
                 ]
             ]
             ]
@@ -197,12 +198,47 @@ legendView =
 
 footerView : Html Msg
 footerView =
-    div [class "py-5 nav-bar"]
+    div [class "py-5 slalom-blue"]
         [ div [class "container"] [
             Html.p [class "m-0 text-center text-white"] [text "Slalom-Hodor 2017"]
         ]
         ]
 
+aboutModal : Html Msg
+aboutModal =
+    div [class "modal fade", id "Modal2", tabIndex "-1", role "dialog", ariaHidden True]
+    [ div [class "modal-dialog", role "document"]
+        [ div [class "modal-content"]
+            [div [class "modal-header slalom-blue text-white"]
+                [ Html.h5 [class "modal-title", id "ModalLabel"] [text "About Slalom-Hodor"]
+                , Html.button [Html.Attributes.type_ "button", class "close", dataDismiss "modal", ariaLabel "Close"] 
+                    [ Html.span [class "fa fa-times fa-icon-color", ariaHidden True] []
+                    ]
+            ]
+       , div [class "modal-body"]
+            [roomLegend]
+       , div [class "modal-footer slalom-blue"][
+            Html.button [Html.Attributes.type_ "button", class "btn btn-info btn-md", dataDismiss "modal"] [text "Close"]
+       ]
+
+       ]
+    ]
+   ]
+roomLegend : Html Msg
+roomLegend =
+    div [class "my-legend"] 
+        [ div [class "legend-title"] [text "Room Status Key Legend"]
+        , div [class "legend-scale"]
+            [Html.ul [class "legend-labels"] 
+                [ Html.li [] [Html.span [class "key-legend-open"][], text "Room is open in outlook and vacant"]
+                , Html.li [] [Html.span [class "key-legend-open-occupied"][], text "Room is open in outlook but occupied"]
+                , Html.li [] [Html.span [class "key-legend-booked-vacant"][], text "Room is booked in outlook but vacant"]
+                , Html.li [] [Html.span [class "key-legend-booked"][], text "Room is booked in outlook and occupied"]
+                ]
+            ]
+        ,div [class "legend-source"] [text "Source: "
+        , Html.a [href "https://bitbucket.org/account/user/meeting-rooms-hackathon/projects/MRA"] [text "source code here"]]
+   ]
 roomStatus : Bool -> Bool -> String
 roomStatus available occupied = 
     case (available, occupied) of
@@ -315,6 +351,26 @@ ariaExpanded =
 ariaControls : String -> Attribute Msg
 ariaControls =
     attribute "aria-controls"
+
+ariaLabel : String -> Attribute Msg
+ariaLabel = 
+    attribute "aria-label"
+
+ariaHidden : Bool -> Attribute Msg
+ariaHidden = 
+    boolAttribute "aria-hidden"
+
+role : String -> Attribute Msg
+role = 
+    attribute "role"
+
+dataDismiss : String -> Attribute Msg
+dataDismiss = 
+    attribute "data-dismiss"
+
+tabIndex : String -> Attribute Msg
+tabIndex = 
+    attribute "tabindex"        
 ---- PROGRAM ----
 
 
