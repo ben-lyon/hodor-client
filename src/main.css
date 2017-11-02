@@ -1,8 +1,8 @@
 :root {
   --BookedAndOccupied: #ef7777;
-  --BookedAndVacant: #f9b31d;
+  --BookedAndVacant: #ffc107;
   --NotBookedAndOccupied: #fff65f;
-  --NotBookedAndVacant: #86E965;
+  --NotBookedAndVacant: #32c954;
 }
 
 img {
@@ -115,7 +115,7 @@ body {
   font-family: helvetica, sans-serif !important;
   min-width: 55% !important;
   margin-bottom: 30px;
-  border-color: #7DE859 !important;
+  border-color: #28A745 !important;
 }
 .slalom-card-header-open {
   background-color: var(--NotBookedAndVacant) !important;
@@ -157,7 +157,7 @@ body {
   font-family: helvetica, sans-serif !important;
   min-width: 55%;
   margin-bottom: 30px;
-  border-color: #ff803a !important;
+  border-color: #E0A800 !important;
 }
 
 .occupied {
